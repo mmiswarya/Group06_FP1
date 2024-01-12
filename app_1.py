@@ -117,6 +117,8 @@ def main():
     </div>
     """
     st.markdown(html_temp,unsafe_allow_html=True)
+    # Add Reliance Industries logo
+    st.image("reliance_logo.png", use_column_width=True)
     result=""
     ticker = 'RELIANCE.NS'
     end_date = pd.Timestamp.today()
