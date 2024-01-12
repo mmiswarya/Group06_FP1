@@ -3,8 +3,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Jan 11 23:20:34 2024
-
-@author: Mmisw
+Group 06 
+Stock Price Prediction Model
 """
 import pandas as pd
 import streamlit as st 
