@@ -3,8 +3,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Jan 11 23:20:34 2024
-Group 06 
-Stock Price Prediction Model
+
+@author: Mmisw
 """
 import pandas as pd
 import streamlit as st 
@@ -26,35 +26,85 @@ def predict_stockprice(df):
     df = technical_dimensions(df)
     df['Date'] = (df['Date'] - pd.to_datetime("1970-01-01")).dt.days.astype(float)
     
-    drop_cols = ['Date', 'Volume', 'Open', 'Low', 'High', 'OpenInt']
-    df = df.drop([col for col in drop_cols if col in df.columns], axis=1)
+    df.index = range(len(df))
 
-    y = df['Close'].copy()
-    X = df.drop(['Close'], 1)
+    test_size  = 0.15
+    valid_size = 0.15
     
-    # Create an instance of Linear Regression model
-    linear_model = LinearRegression()
+    test_split_idx  = int(df.shape[0] * (1-test_size))
+    valid_split_idx = int(df.shape[0] * (1-(valid_size+test_size)))
     
-    # Train the model
-    linear_model.fit(X, y)
-    
-    # Predict on the entire dataset
-    y_pred = linear_model.predict(X)
-    
-    # Evaluate the model
-    mse = mean_squared_error(y, y_pred)
+    train_df  = df.loc[:valid_split_idx].copy()
+    valid_df  = df.loc[valid_split_idx+1:test_split_idx].copy()
+    test_df   = df.loc[test_split_idx+1:].copy()
 
-    # Evaluate the model on validation set
-    mse_valid = mean_squared_error(y, y_pred)
-    # Plot the actual vs predicted values on the validation set
-    fig, ax = plt.subplots()
-    ax.scatter(y, y_pred)
-    ax.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=3)
-    ax.set_xlabel('Actual Closing Price')
-    ax.set_ylabel('Predicted Closing Price')
-    ax.set_title('Actual vs Predicted Closing Price (Validation Set)')
-    st.pyplot(fig)
-    return y_pred
+    drop_cols = ['Volume', 'Open', 'Low', 'High', 'OpenInt']
+
+    train_df = train_df.drop([col for col in drop_cols if col in train_df.columns], axis=1)
+    valid_df = valid_df.drop([col for col in drop_cols if col in valid_df.columns], axis=1)
+    test_df = test_df.drop([col for col in drop_cols if col in test_df.columns], axis=1)
+    
+    y_train = train_df['Close'].copy()
+    X_train = train_df.drop(['Close'], 1)
+    
+    y_valid = valid_df['Close'].copy()
+    X_valid = valid_df.drop(['Close'], 1)
+    
+    y_test  = test_df['Close'].copy()
+    X_test  = test_df.drop(['Close'], 1)
+
+    # Drop NaN values from the datasets
+    X_train.dropna(inplace=True)
+    y_train = y_train.loc[X_train.index]  # Ensure y_train aligns with X_train after dropping NaNs
+    
+    X_valid.dropna(inplace=True)
+    y_valid = y_valid.loc[X_valid.index]  # Ensure y_valid aligns with X_valid after dropping NaNs
+    
+    X_test.dropna(inplace=True)
+    y_test = y_test.loc[X_test.index]     # Ensure y_test aligns with X_test after dropping NaNs
+    
+    # Ensure dates are in Pandas datetime format
+    train_df['Date'] = pd.to_datetime(train_df['Date'])
+    valid_df['Date'] = pd.to_datetime(valid_df['Date'])
+    
+    # Assuming X_test also has a Date column
+    X_test['Date'] = pd.to_datetime(X_test['Date'])
+    
+    X_train = X_train.drop(columns=['Date'])
+    X_valid = X_valid.drop(columns=['Date'])
+    X_test = X_test.drop(columns=['Date'])
+    
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+
+   # Validate the model
+    y_valid_pred = model.predict(X_valid)
+    valid_mse = mean_squared_error(y_valid, y_valid_pred)
+    # Predict the stock prices using the test data
+    y_pred = model.predict(X_test)
+    # Optionally, compare the predictions to the actual values
+    test_mse = mean_squared_error(y_test, y_pred)
+    
+    # Replace 'original_df' with the DataFrame that contains your original dates
+    # Ensure the dates align with your test data
+    test_dates = df['Date'].tail(len(y_test))  # Adjust this to match your test dataset's dates
+    
+    # Creating a subplot figure
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    
+    # Adding the real closing prices
+    fig.add_trace(go.Scatter(x=test_dates, y=y_test, name='Real Closing Price', mode='lines'), secondary_y=False)
+    
+    # Adding the predicted closing prices
+    fig.add_trace(go.Scatter(x=test_dates, y=y_pred, name='Predicted Closing Price', mode='lines'), secondary_y=False)
+    
+    # Adding title and labels
+    fig.update_layout(title_text="Real vs Predicted Closing Prices")
+    fig.update_xaxes(title_text="Date")
+    fig.update_yaxes(title_text="Closing Price", secondary_y=False)
+    
+    st.plotly_chart(fig)
+    return y_pred[-1]
     
 def technical_dimensions(df):
     
@@ -102,12 +152,11 @@ def technical_dimensions(df):
  # Function to get sentiment for the current date
 def get_sentiment_score(df, current_date):
      current_date = pd.to_datetime(current_date)
-     row = df[df['DateTime'] == current_date]
+     row = df[df['Date'] == current_date]
      if not row.empty:
-         #return row['Score'].values[0]
-         return '0.65'
+         return row['compound_score'].values[0]
      else:
-         return None
+         return '0.00'
 
 def main():
     st.title("Stock Price Prediction")
@@ -126,17 +175,15 @@ def main():
     if st.button("Predict Reliance stock price"):
         result=predict_stockprice(df)
         st.success(result)
-        data = []
-        df = pd.DataFrame(data)
-        #df['DateTime'] = pd.to_datetime(df['DateTime'])     
-        # Button to fetch sentiment for the current date
-        #technical_dimensions(df)
     if st.button("Fetch Sentiment for Today"):
-        #current_date = pd.Timestamp.today().strftime("%Y-%m-%d")
-        sentiment_score = 0.65      #get_sentiment_score(df, current_date)  
+        current_date = pd.Timestamp.today().strftime("%Y-%m-%d")
+        df_t = pd.read_csv("C:\\Users\\Mmisw\\Downloads\\twitter_df1 1.csv")
+        sentiment_score = get_sentiment_score(df_t, current_date)  
         if sentiment_score is not None:
-            #st.success(f"Sentiment Score for {current_date}: {sentiment_score:.4f}")
-            if sentiment_score >= 0.5:
+            sentiment_score = float(sentiment_score)
+            if -0.5 < sentiment_score < 0.5:
+                st.warning("Neutral Sentiment!")
+            elif sentiment_score >= 0.5:
                 st.success("Positive Sentiment!")
             else:
                 st.error("Negative Sentiment!")
