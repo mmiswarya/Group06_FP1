@@ -4,7 +4,7 @@
 """
 Created on Thu Jan 11 23:20:34 2024
 
-@author: Mmisw
+@author:Group 06
 """
 import pandas as pd
 import streamlit as st 
@@ -177,7 +177,7 @@ def main():
         st.success(result)
     if st.button("Fetch Sentiment for Today"):
         current_date = pd.Timestamp.today().strftime("%Y-%m-%d")
-        df_t = pd.read_csv("C:\\Users\\Mmisw\\Downloads\\twitter_df1 1.csv")
+        df_t = pd.read_csv("twitter_df1 1.csv")
         sentiment_score = get_sentiment_score(df_t, current_date)  
         if sentiment_score is not None:
             sentiment_score = float(sentiment_score)
