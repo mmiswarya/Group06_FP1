@@ -177,7 +177,7 @@ def main():
         st.success(result)
     if st.button("Fetch Sentiment for Today"):
         current_date = pd.Timestamp.today().strftime("%Y-%m-%d")
-        df_t = pd.read_csv("https://github.com//mmiswarya//Group06_FP1//blob//main//twitter_df.csv", encoding='utf-8')
+        df_t = pd.read_csv("https://github.com/mmiswarya/Group06_FP1/raw/main/twitter_df.csv", sep=',', encoding='utf-8')
         sentiment_score = get_sentiment_score(df_t, current_date)  
         if sentiment_score is not None:
             sentiment_score = float(sentiment_score)
