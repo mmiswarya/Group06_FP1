@@ -24,9 +24,11 @@ def welcome():
 def predict_stockprice(df):
     
     df = technical_dimensions(df)
-    df['Date'] = (df['Date'] - pd.to_datetime("1970-01-01")).dt.days.astype(float)
+    #df['Date'] = (df['Date'] - pd.to_datetime("1970-01-01")).dt.days.astype(float)
     
-    df.index = range(len(df))
+    #df.index = range(len(df))
+    df['Date'] = pd.to_datetime(df['Date'])
+    df.reset_index(drop=True, inplace=True)
 
     test_size  = 0.15
     valid_size = 0.15
