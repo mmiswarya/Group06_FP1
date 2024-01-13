@@ -6,7 +6,8 @@ Created on Thu Jan 11 23:20:34 2024
 
 @author:Group 06
 """
-!pip install plotly
+import subprocess
+subprocess.run(["pip", "install", "plotly"])
 import pandas as pd
 import streamlit as st 
 #import plotly.graph_objs as go
