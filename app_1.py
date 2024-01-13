@@ -7,11 +7,9 @@ Created on Thu Jan 11 23:20:34 2024
 @author:Group 06
 """
 import subprocess
-subprocess.run(["pip", "install", "plotly"])
 import pandas as pd
 import streamlit as st 
-#import plotly.graph_objs as go
-import plotly.graph_objects as go
+import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import yfinance as yf
 from sklearn.linear_model import LinearRegression
