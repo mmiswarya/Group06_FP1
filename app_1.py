@@ -14,7 +14,6 @@ from plotly.subplots import make_subplots
 import yfinance as yf
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
 #@app.route('/')
