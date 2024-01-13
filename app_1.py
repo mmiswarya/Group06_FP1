@@ -163,7 +163,7 @@ def get_sentiment_score(df, current_date):
 def main():
     html_temp = """
     <div style="background-color:red;padding:10px">
-    <h2 style="color:white;text-align:center;">Group 06 Stock Model</h2>
+    <h2 style="color:yellow;text-align:center;">Group 06 Reliance Stock Price Analysis</h2>
     </div>
     """
     st.markdown(html_temp,unsafe_allow_html=True)
