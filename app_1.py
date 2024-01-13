@@ -25,7 +25,6 @@ def predict_stockprice(df):
     
     df = technical_dimensions(df)
     df['Date'] = (df['Date'] - pd.to_datetime("1970-01-01")).dt.days.astype(float)
-    df.index = pd.to_datetime(df.index).tz_localize("UTC").tz_convert("IST")
     
     df.index = range(len(df))
 
