@@ -161,10 +161,9 @@ def get_sentiment_score(df, current_date):
          return '0.00'
 
 def main():
-    st.title("Stock Price Prediction")
     html_temp = """
     <div style="background-color:red;padding:10px">
-    <h2 style="color:white;text-align:center;">Group 06 Stock Model App </h2>
+    <h2 style="color:white;text-align:center;">Group 06 Stock Model</h2>
     </div>
     """
     st.markdown(html_temp,unsafe_allow_html=True)
@@ -174,9 +173,11 @@ def main():
     start_date = end_date - pd.DateOffset(years=5)
     
     df = yf.download(ticker, start=start_date, end=end_date)
-    if st.button("Predict Reliance stock price"):
+    if st.button("Run regression model"):
         result=predict_stockprice(df)
-        st.success(result)
+        comment = "Predicted Close Price : "
+        combined_message = f"{comment}: {result}"
+        st.success(combined_message)
     if st.button("Fetch Sentiment for Today"):
         current_date = pd.Timestamp.today().strftime("%Y-%m-%d")
         df_t = pd.read_csv("https://github.com/mmiswarya/Group06_FP1/raw/main/twitter_df.csv", sep=',', encoding='utf-8')
